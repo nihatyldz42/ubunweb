@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=5">
+    <title>CMD UI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300&display=swap" rel="stylesheet">
+    <style>
+        body{
+            font-size: small;
+            font-family: 'Ubuntu', sans-serif;
+            background-color: black;
+            color: rgb(40, 161, 90);
+        }
+        input[type=text] {
+            font-family: 'Ubuntu', sans-serif;
+            color:chartreuse;
+            background-color:rgba(255, 255, 255, 0);
+            border: 0px;
+        }
+        input[type="text"]:focus{
+            outline: none;
+        } 
+        .c1 {
+            color: aqua;
+        }
+    </style>
+</head>
+<body>
+    <div id="history">
+        komut listesini görmek için help yazabilirsiniz <br>
+    </div>
+    <small class="c1">root-/$ </small><input type="text" id="cmd">
+    <script>
+        let inp = document.querySelector("#cmd")
+        let hst = document.querySelector("#history")
+        let bdy = document.body;
+
+        let staticCommands = {
+            "help" : `
+             [clear] konsolu temizle
+             [info] hakkımda
+             [time] hangi tarihdeyiz?
+             [echo][arg] bildiğimiz echo
+             [alert][arg] bildiğimiz alert
+             [calc][arg]  hesap makinesi
+             [gethtml][url] kaynak kodu görme
+             [rnd-bg] arkaplanı rastgele seç
+            `,
+            "info" : `Full stack yolunda çokca zaman öldürmüş hevesli genç developer`
+        }
+
+        let funcCommands = {
+            "clear" : ()=> print(""),
+            "time" : ()=> print(new Date().toLocaleDateString()),
+            "echo" : (x) => print(x.join(" ")) ,
+            "alert" : (x) => alert(x.join(" ")),
+            "calc" : (x) => print(eval(x.join(" "))),
+            "gethtml" : (x)=> get(x.join(" ")),
+            "rnd-bg" : ()=> print(bdy.style.backgroundColor =  "#"+Math.floor(Math.random()*16777215).toString(16))
+        }
+
+        async function get(url) {
+            try {
+                let rsp = await fetch(url).then(r=>r.text())
+                print(rsp)
+            } catch (error) {
+                print("cors error")
+            }
+        }
+
+        const print = (x) => x ? hst.innerText += x : hst.innerHTML = "";
+
+        setInterval(()=>inp.focus(),500)
+        inp.addEventListener("keyup",(x)=>{
+            if(x.key!="Enter") return;
+        
+            let val = x.target.value.split(" ")[0];
+
+            if(hst.innerHTML.length > 0) print("\n\n")
+
+            if(staticCommands[val]) print(staticCommands[val])
+            else if(funcCommands[val]) funcCommands[val](x.target.value.split(" ").splice(1))
+            else print("boyle bir komut bulunamadı yardım için help yazın")
+
+            x.target.value = ""
+        })
+    </script>
+</body>
+</html>
